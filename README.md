@@ -21,7 +21,7 @@ The following is a guide of where to find the script to generate each figure, ta
   * Script: top_ten_fastest_fires.R
   * Figure: top_ten_fastest_fires.png
 * Figure 3. Maximum fire speed by EPA Level III ecoregion and map of fastest fires
-  * Script: fire_behavior_by_ecoregion
+  * Script: fire_behavior_by_ecoregion.R
   * Figure: ecoregion_maps_fastfires_speed.png
 * Figure 4. Time series of 95th-percentile fire speed and fire growth rate (2002-2024)
   * Script: fire_behavior_by_year.R
