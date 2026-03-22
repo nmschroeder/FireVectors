@@ -59,5 +59,24 @@ The following is a guide of where to find the script to generate each figure, ta
   * Script: fire_behavior_by_ecoregion.R
   * Figure: ecoregion_maps_fgr.png 
 * Table S1. Number of fires and 95th-percentile speed by ecoregion and NLCD vegetation type
-  * fire_speed_by_vegetation_type_part1.R 
+  * fire_speed_by_vegetation_type_part1.R
+
+# Initial set up and FireVectors algorithm files
+
+* Initial set up: prepare_mtbs_western_us.R
+  * Inputs
+    * MTBS fire boundaries
+    * United States Tiger Line state shapefile
+    * FIRMS archived active fire detection data for VIIRS and MODIS
+  * Outputs
+    * MTBS fire boundaries for time period of overlap with FIRMS data 
+    * Western United States boundary file
+    * FIRMS data clipped to Western United States
+ * FireVectors, part 1: HPC/fire_vectors_01.R
+    * Create fire progressions and speed vectors
+    * Designed to run as a task array with one fire event per task
+ * FireVectors, part 2: HPC/fire_vectors_02.R
+    * Collates perimeter and speed vector data from FireVectors, part 1 
+ * FireVectors, part 3: HPC/fire_vectors_03.R
+    * Collates active fire detection data labeled by fire event from FireVectors, part 1
 
