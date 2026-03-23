@@ -13,7 +13,7 @@ Please obtain the following files from their temporary locations below
      * The remaining active fire detections for a given overpass are assigned to this time stamp
    * SATELLITE, INSTRUMENT, VERSION, DAYNIGHT
      * These are fields from FIRMS indicating the satellite, instrument, version, and day (D) vs. night (N) indicator
-   *  N_pts
+   * N_pts
      * The number of active fire pixel detections used to create the current perimeter
    * perim_avail
      * A TRUE/FALSE flag to indicate whether or not a perimeter is available at this time step
