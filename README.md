@@ -61,17 +61,20 @@ The following is a guide of where to find the script to generate each figure, ta
 * Table S1. Number of fires and 95th-percentile speed by ecoregion and NLCD vegetation type
   * fire_speed_by_vegetation_type_part1.R
 
-# Initial set up and FireVectors algorithm files
+# Initial set up and running FireVectors algorithm
 
 * Initial set up: prepare_mtbs_western_us.R
   * Inputs
-    * MTBS fire boundaries
-    * United States Tiger Line state shapefile
-    * FIRMS archived active fire detection data for VIIRS and MODIS
+    * MTBS burned area boundaries data set (https://www.mtbs.gov/direct-download)
+    * United States Tiger Line state shapefile (https://www2.census.gov/geo/tiger/TIGER2025/STATE/)
+    * FIRMS archived active fire detection data for VIIRS and MODIS (https://firms.modaps.eosdis.nasa.gov/download/)
   * Outputs
-    * MTBS fire boundaries for time period of overlap with FIRMS data 
+    * MTBS fire boundaries for time period of overlap with FIRMS data
+      * mtbs_wus_2002_2024.shp and ancillary files 
     * Western United States boundary file
+      * western_us.shp and ancillary files 
     * FIRMS data clipped to Western United States
+      * shapefiles beginning in western_us_fire_archive
  * FireVectors, part 1: HPC/fire_vectors_01.R
     * Create fire progressions and speed vectors
     * Designed to run as a task array with one fire event per task
@@ -80,3 +83,15 @@ The following is a guide of where to find the script to generate each figure, ta
  * FireVectors, part 3: HPC/fire_vectors_03.R
     * Collates active fire detection data labeled by fire event from FireVectors, part 1
 
+# Downloading ancillary files for figures, tables, and analyses
+ * Please download LC20_Elev_220.tif elevation file from LANDFIRE and place in FireVectors directory
+ * Create MTBS directory inside FireVectors directory
+   * Place mtbs_wus_2002_2024.shp (and supporting files ending in .prj, .shx, and .dbf) from prepare_mtbs_western_us.R in the MTBS directory (MTBS data clipped to the Western US and time frame of active fire detection data)
+ * Create FIRMS directory inside FireVectors
+   * Place files beginning with western_us_fire_archive created with prepare_mtbs_western_us.R in the FIRMS directory (FIRMS data clipped to the Western US)
+ * Create ecoregions directory inside the FireVectors directory
+   * Download Environmental Protection Agency Ecoregion Level III files beginning in us_eco_l3.* and place them there
+ * Create NLCD directory inside the FireVectors directory
+   * Download annual NLCD data for 2001 through 2024 and place inside (example file for 2001: Annual_NLCD_LndCov_2001_CU_C1V1.tif)
+ * Create TIGER directory inside the FireVectors directory
+   * Place shapefile files beginning in western_us.* generated from prepare_mtbs_western_us.R in the TIGER directory (Western US shapefile)
