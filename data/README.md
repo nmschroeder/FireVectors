@@ -45,19 +45,19 @@ Please obtain the following files from their temporary locations below
   * d_xy
     * The 2D Euclidean distance traveled between (x1, y1) and (x2, y2) in km
   * v_xy
-    * The fire speed estimate from dividing d_xy by dt (km h$^{-1}$)
+    * The fire speed estimate from dividing d_xy by dt (km h⁻¹)
   * d_elev
     * An estimate of the distance traveled along the terrain below the speed vector
     * This uses a numerical approximation for the arc length formula
     * We use the LANDFIRE 30-m digital elevation model for the terrain
   * v_elev
-    * The corresponding estimate for fire speed that incorporates the terrain below the speed vector (km h$^{-1}$)
+    * The corresponding estimate for fire speed that incorporates the terrain below the speed vector (km h⁻¹)
   * dA
-    * The change in area for a given polygon within the current fire progression in km$^{2}$
+    * The change in area for a given polygon within the current fire progression in km²
     * Some progressions may have multiple polygons associated with distinct fires within the progression
     * In this case, there is a row for each polygon within the progression with its own fire speed and fire growth rate
   * dAdt
-    * The fire growth rate (km$^{2}$ h$^{-1}$) estimated by dividing dA by dt
+    * The fire growth rate (km² h⁻¹) estimated by dividing dA by dt
   * Incid_Name, Incid_Type, and Ig_Date
     * Fields from MTBS indicating the incident name, the incident type (wildfire or prescribed), and the ignition date
   * New_ID
