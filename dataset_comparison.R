@@ -19,10 +19,6 @@ mtbs <- st_read("MTBS/mtbs_wus_2000_2024.shp")
 feds_dir <- "/Volumes/SSD/FEDS/Largefire"
 feds_2018 <- paste0(feds_dir, "/LargeFires_2018.gpkg")
 st_layers(feds_2018)
-feds_perims_2018 <- st_read(feds_2018, layer = "perimeter") %>% 
-  st_make_valid() %>%
-  st_transform(crs = st_crs(mtbs_fire))
-str(feds_perims_2018)
 
 # Read in FireVectors data
 firevectors <- st_read("data/perim_polygons_viirs.geojson")
@@ -39,6 +35,11 @@ mtbs_fire <- dplyr::filter(mtbs, Incid_Name == "CAMP")
 st_crs(mtbs_fire)
 
 ggplot() + geom_sf(data = nifc_fire, fill = NA)
+
+feds_perims_2018 <- st_read(feds_2018, layer = "perimeter") %>% 
+  st_make_valid() %>%
+  st_transform(crs = st_crs(mtbs_fire))
+str(feds_perims_2018)
 
 
 # Find fired perimeters with a similar ignition date
@@ -103,8 +104,6 @@ fires_df <- rbind.data.frame(mtbs_df, fired_df, feds_df, fv_df, fvm_df)
 min_date <- mtbs_fire$Ig_Date %>% as.POSIXct()
 max_date <- as.POSIXct("2018-11-25") 
 
-library(scales)
-
 bb <- st_bbox(st_transform(fires_df, crs = 4326))
 x_breaks <- pretty(c(bb["xmin"], bb["xmax"]), n = 2) 
 
@@ -131,3 +130,38 @@ ggplot() + geom_sf(data = arrange(fires_df, desc(date)), fill = NA, mapping = ae
 
 ggsave("dataset_comparison_panel.png", dpi = 600, width = 183, height = 130, units = "mm")
 
+# Use fill to show differences in burned area detection
+
+# ggplot() + geom_sf(data = arrange(fires_df, desc(date)), mapping = aes(color = date, fill = date), lwd = 0.6) +
+#   scale_fill_viridis_c(
+#     name = "Date",
+#     option = "inferno",
+#     trans = "time",
+#     begin = 0, 
+#     end = 1.0,
+#     labels = label_date("%b-%d"),
+#     limits = c(min_date, max_date),
+#     guide = guide_colorbar()
+#   ) +
+#   scale_color_viridis_c(
+#     name = "Date",
+#     option = "inferno",
+#     trans = "time",
+#     begin = 0, 
+#     end = 1.0,
+#     labels = label_date("%b-%d"),
+#     limits = c(min_date, max_date),
+#     guide = guide_colorbar()
+#   ) +
+#   scale_x_continuous(breaks = x_breaks) +
+#   theme_bw() +
+#   theme(
+#     legend.position = c(0.76, 0.45),     # x,y in [0,1]; aims at bottom-right cell
+#     legend.justification = c(0, 1),
+#     legend.background = element_rect(fill = "white", color = NA),
+#     panel.spacing.x = unit(0.8, "lines")
+#   ) +
+#   facet_wrap(~source)
+# 
+# ggsave("dataset_comparison_panel_v2.png", dpi = 600, width = 183, height = 130, units = "mm")
+# 
