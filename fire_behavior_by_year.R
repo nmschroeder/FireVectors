@@ -5,6 +5,7 @@ library(lubridate)
 library(tidyr)
 library(ggh4x)
 library(scales)
+library(cowplot)
 
 theme_set(
   theme_bw(base_size = 10, base_family = "Helvetica") +
@@ -145,7 +146,8 @@ for (i in 1:nrow(quantile_df)){
 # No trend in the cut-off values themselves (this is a proxy for maximum speed)
 p1 <- ggplot() + geom_point(data = quantile_df, mapping = aes(x = year, y = speed)) +
   xlab("Year") + ylab("95th-Percentile Speed (km h\u207B\u00B9)") +
-  ggh4x::force_panelsizes(rows = unit(2.2, "in"), cols = unit(2.5, "in"))
+  ggh4x::force_panelsizes(rows = unit(2.2, "in"), cols = unit(2.5, "in")) +
+  ylim(c(-0.1, 3.1))
 
 #ggsave("fire_speed_by_time_95th_percentile.png", plot = p1, dpi = 600, width = 3.5, height = 3)
 
@@ -172,18 +174,22 @@ for (i in 1:nrow(fgr_df)){
 
 fgr_df
 
-# No significant trends here, either
+test_fgr <- lm(fgr_km2 ~ year, data = fgr_df)
+summary(test_fgr)
+
+# Significant trend found here
 p2 <- ggplot() + geom_point(data = fgr_df, mapping = aes(x = year, y = fgr_km2)) +
   xlab("Year") + ylab("95th-Percentile Growth Rate (km\u00B2 h\u207B\u00B9)") +
-  ggh4x::force_panelsizes(rows = unit(2.2, "in"), cols = unit(2.5, "in"))
+  ggh4x::force_panelsizes(rows = unit(2.2, "in"), cols = unit(2.5, "in")) +
+  geom_abline(intercept = coefficients(test_fgr)[1], slope = coefficients(test_fgr)[2]) +
+  ylim(c(-1, 26))
 
 #ggsave("fire_fgr_by_time_95th_percentile.png", plot = p2, dpi = 600, width = 3.5, height = 3)
 
 fire_trends_panel <- plot_grid(p1, NULL, p2, ncol = 3, rel_widths = c(1, -0.05, 1), align = "hv", labels = c("a.", " ", "b."), axis = "tblr", label_fontface = "plain")
 fire_trends_panel
 
-test_fgr <- lm(fgr_km2 ~ year, data = fgr_df)
-summary(test_fgr)
+
 
 ggsave("fire_trends_panel.png", plot = fire_trends_panel, dpi = 600, width = 7.5, height = 3, bg = "white")
 
