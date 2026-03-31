@@ -12,7 +12,7 @@ nirops <- st_read("NIROPS/nirops_mtbs_match.shp")
 nirops_speed <- read.csv("NIROPS/burn_direction_nirops.csv")
 str(nirops_speed)
 
-california <- st_read("~/Data/TIGER/tl_2012_us_state.shp") %>% dplyr::filter(NAME == "California") %>% st_transform(crs = 5070)
+california <- st_read("TIGER/tl_2012_us_state.shp") %>% dplyr::filter(NAME == "California") %>% st_transform(crs = 5070)
 
 nirops_sf <- st_as_sf(dplyr::filter(nirops_speed, !is.na(x1), !is.na(y1)), coords = c("x1", "y1"), crs = 5070)
 
@@ -32,9 +32,6 @@ nirops_fastest <- nirops_ca[1,]
 
 nirops_perims <- nirops %>% dplyr::filter(New_ID == nirops_fastest$New_ID)
 
-# Read in reference data from NIFC
-nifc <- st_read("~/Data/InterAgencyFirePerimeterHistory_All_Years_View/InterAgencyFirePerimeterHistory_All_Years_View.shp")
-
 # Read in data from FIRED
 fired <- st_read("~/Data/fired/fired_uscan_to2021121_daily_fixed.gpkg")
 
@@ -42,11 +39,10 @@ fired <- st_read("~/Data/fired/fired_uscan_to2021121_daily_fixed.gpkg")
 mtbs <- st_read("MTBS/mtbs_wus_2000_2024.shp")
 
 # Read in data from FEDS
-feds_dir <- "/Volumes/SSD/FEDS/Largefire"
+feds_dir <- "FEDS/Largefire"
 feds_2020 <- paste0(feds_dir, "/LargeFires_2020.gpkg")
 
 st_layers(feds_2020)
-
 
 # Read in FireVectors data
 firevectors <- st_read("data/perim_polygons_viirs.geojson")
@@ -56,13 +52,7 @@ fv_modis <- st_read("data/perim_polygons_modis.geojson")
 
 fv_sample <- dplyr::filter(firevectors, New_ID == nirops_fastest$New_ID)
 
-nifc_fire <- dplyr::filter(nifc, IRWINID == paste0("{", nirops_fastest$irwinID, "}"))
-
 mtbs_fire <- dplyr::filter(mtbs, New_ID == nirops_fastest$New_ID)
-
-st_crs(mtbs_fire)
-
-ggplot() + geom_sf(data = nifc_fire, fill = NA)
 
 feds_perims_2020 <- st_read(feds_2020, layer = "perimeter") %>% 
   st_make_valid() %>%
@@ -86,12 +76,7 @@ fired_mtbs_match <- fired_filter[idx,]
 
 ggplot() + geom_sf(data = fired_mtbs_match, fill = NA, mapping = aes(color = as.factor(id)))
 
-
 ggplot() + geom_sf(data = fired_mtbs_match, fill = NA, mapping = aes(color = date))
-
-# What ignition date does NIFC give? Find fires within the dates and region and
-# select the unique FIRED ID(s) for that
-
 
 idx <- st_intersects(feds_perims_2020, st_buffer(mtbs_fire, dist = 5000), sparse = FALSE)
 sum(idx)
@@ -106,22 +91,14 @@ if (length(unique(feds_sample$fireID))){
 feds_fire <- feds_perims_2020 %>% dplyr::filter(fireID == id)
 feds_fire$date <- as.POSIXct(feds_fire$time, format = "%Y-%m-%dT%H:%M:%S", tz = "UTC")
 
-
 fv_fire <- firevectors %>% dplyr::filter(New_ID == nirops_fastest$New_ID) 
 fvm_fire <- fv_modis %>% dplyr::filter(New_ID == nirops_fastest$New_ID)
 
 # Convert to a consistent CRS
-nifc_fire <- nifc_fire %>% st_transform(crs = 5070)
 feds_fire <- feds_fire %>% st_transform(crs = 5070)
 nirops_fire <- nirops_perims %>% st_transform(crs = 5070)
 fv_fire   <- fv_fire %>% st_transform(crs = 5070)
 fired_fire <- fired_mtbs_match
-
-nifc_df <- dplyr::select(nifc_fire, geometry) %>% mutate(date = as.POSIXct(NA), source = "a. NIFC")
-mtbs_df <- dplyr::select(mtbs_fire, geometry) %>% mutate(date = as.POSIXct(NA), source = "a. MTBS")
-
-
-
 
 fired_df <- dplyr::select(fired_fire, geom, date) %>% rename(geometry = geom) %>% mutate(source = "a. FIRED")
 feds_df <- dplyr::select(feds_fire, geom, date) %>% rename(geometry = geom) %>% mutate(source = "b. FEDS")
