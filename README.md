@@ -39,7 +39,10 @@ The following is a guide of where to find the script to generate each figure, ta
 * Figure 8. Comparison of fire event metrics derived from MODIS and VIIRS
   * Script: modis_vs_viirs_comparison.R
   * Figure: modis_vs_viirs_comparison_panel.png
-* Figure 9. Comparison of selected published geospatial data sets for the 2018 Camp Fire
+* Figure 9. Comparison of fire speed derived from MODIS to fire speed derived from NIROPS
+  * Script: nirops_comparison.R
+  * Figure: modis_nirops_comparison.png
+* Figure 10. Comparison of selected published geospatial data sets for the 2018 Camp Fire
   * Script: dataset_comparison.R
   * Figure: dataset_comparison_panel.png
 * Table 1. Number of fires searched and analyzed from MTBS with respect to Aqua MODIS and Suomi NPP VIIRS
