@@ -85,6 +85,16 @@ The following is a guide of where to find the script to generate each figure, ta
     * Collates perimeter and speed vector data from FireVectors, part 1 
  * FireVectors, part 3: HPC/fire_vectors_03.R
     * Collates active fire detection data labeled by fire event from FireVectors, part 1
+ * NIROPS speed comparison, part 1: HPC/nirops_mtbs_match.R
+    * Matches NIROPS-based fire progressions from Magstadt et al. (In Review) to MTBS perimeters by IrwinID 
+ * NIROPS speed comparison, part 2: HPC/fire_vectors_01_daily.R
+    * Computes fire speed between subsequent nighttime Terra MODIS fire progressions to get closest temporal alignment with NIROPS progressions
+ * NIROPS speed comparison, part 3: HPC/fire_vectors_02_daily.R
+    * Collates results of fire_vectors_01_daily.R into one data frame (burn_direction_daily.csv)
+ * NIROPS speed comparison, part 4: HPC/fire_vectors_01_nirops.R
+    * Computes fire speed between subsequent NIROPS fire progressions occurring between 0100 and 0900 UTC, inclusive
+ * NIROPS speed comparison, part 5: HPC/fire_vectors_02_nirops.R
+    * Collates results of fire_vectors_01_nirops.R into one data frame (burn_direction_nirops.csv)
 
 # Downloading ancillary files for figures, tables, and analyses
  * Please download LC20_Elev_220.tif elevation file from LANDFIRE and place in FireVectors directory
@@ -98,3 +108,6 @@ The following is a guide of where to find the script to generate each figure, ta
    * Download annual NLCD data for 2001 through 2024 and place inside (example file for 2001: Annual_NLCD_LndCov_2001_CU_C1V1.tif)
  * Create TIGER directory inside the FireVectors directory
    * Place shapefile files beginning in western_us.* generated from prepare_mtbs_western_us.R in the TIGER directory (Western US shapefile)
+ * Create NIROPS directory inside the FireVectors directory
+   * Download NIROPS shapefiles from Magstadt et al. (In Review) using the reserved DOI when available
+   * doi:10.17632/95rj5d379g.1 
