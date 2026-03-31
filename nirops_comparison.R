@@ -30,8 +30,8 @@ theme_set(
 
 
 # Read in speed vector data sets
-nirops_vectors <- read.csv("NIROPS/burn_direction_nirops.csv")
-modis_vectors <- read.csv("NIROPS/burn_direction_daily.csv")
+nirops_vectors <- read.csv("data/burn_direction_nirops.csv")
+modis_vectors <- read.csv("data/burn_direction_daily.csv")
 #viirs_vectors <- read.csv("data/burn_direction_viirs.csv")
 #modis_vectors <- read.csv("data/burn_direction_modis.csv")
 
