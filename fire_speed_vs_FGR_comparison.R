@@ -105,7 +105,7 @@ m_grass <- lm(log(dAdt) ~ log(v_xy) + 1, data = dplyr::filter(modis_df, dAdt > q
 summary(m_grass)
 
 m_df <- data.frame(yintercept = c(m_forest$coefficients[1], m_shrub$coefficients[1], m_grass$coefficients[1]), slope = c(m_forest$coefficients[2], m_shrub$coefficients[2], m_grass$coefficients[2]), R2 = c(summary(m_forest)$adj.r.squared, summary(m_shrub)$adj.r.squared, summary(m_grass)$adj.r.squared), nlcd_class = as.factor(c("Forest", "Shrubland", "Herbaceous")))
-m_df$label <- paste0("R^2 == ", round(m_df$R2, 2))
+m_df$label <- paste0("R^2 == ", sprintf('"%.2f"',round(m_df$R2, 2)))
 m_df$x <- -5
 m_df$y <- 2.5
 

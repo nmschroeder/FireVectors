@@ -248,7 +248,7 @@ p_compare_final_area <- ggplot() + geom_point(data = summary_df, mapping = aes(x
   xlab(expression("MODIS Final Area (km"^2*")")) +
   ylab(expression("VIIRS Final Area (km"^2*")")) +
   annotate("text", x = 0, y = 6076, 
-           label = sprintf("R^2 == %.3f", R2),
+           label = sprintf("R^2 == %.2f", R2),
            parse = TRUE,
            hjust = 0, size = 5) +
   coord_equal() +
@@ -281,7 +281,7 @@ p_compare_max_speed <- ggplot(data = summary_df) + geom_point(mapping = aes(x = 
   xlab(expression("MODIS Max Speed (kph)")) +
   ylab(expression("VIIRS Max Speed (kph)")) +
   annotate("text", x = 0, y = 3.43, 
-           label = sprintf("R^2 == %.3f", R2_2),
+           label = sprintf("R^2 == %.2f", R2_2),
            parse = TRUE,
            hjust = 0, size = 5) +
   coord_equal() +
@@ -305,7 +305,7 @@ p_compare_max_fgr <- ggplot(data = summary_df) +
   labs(x = expression("MODIS Max FGR (" * km^2 * "/hr)"),
        y = expression("VIIRS Max FGR (" * km^2 * "/hr)")) +
   annotate("text", x = 0, y = 49, 
-           label = sprintf("R^2 == %.3f", R2_dA),
+           label = sprintf("R^2 == %.2f", R2_dA),
            parse = TRUE,
            hjust = 0, size = 5) +
   coord_equal() +

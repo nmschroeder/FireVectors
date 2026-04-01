@@ -30,8 +30,8 @@ theme_set(
 
 
 # Read in speed vector data sets
-nirops_vectors <- read.csv("data/burn_direction_nirops.csv")
-modis_vectors <- read.csv("data/burn_direction_daily.csv")
+nirops_vectors <- read.csv("NIROPS/burn_direction_nirops.csv")
+modis_vectors <- read.csv("NIROPS/burn_direction_daily.csv")
 #viirs_vectors <- read.csv("data/burn_direction_viirs.csv")
 #modis_vectors <- read.csv("data/burn_direction_modis.csv")
 
@@ -239,12 +239,18 @@ N_examples
 m <- lm(max_speed_modis ~ max_speed_nirops, data = summary_df)
 summary(m)
 
+R2 <- summary(m)$r.squared
+
 ggplot() + geom_point(data = summary_df, mapping = aes(x = max_speed_nirops, y = max_speed_modis), alpha = 0.5) + 
   geom_abline(slope = 1, intercept = 0, color = 'red') + 
   xlim(c(-0.01, 1.2)) +
   ylim(c(-0.01, 1.2)) +
   xlab("NIROPS Daily Max. Speed (km h\u207B\u00B9)") +
   ylab("FireVectors (MODIS) Daily Max. Speed (km h\u207B\u00B9)") +
+  annotate("text", x = 0, y = 0.2, 
+           label = sprintf("R^2 == %.2f", R2),
+           parse = TRUE,
+           hjust = 0, size = 5) +
   coord_equal()
 
 ggsave("modis_nirops_comparison.png", dpi = 600, width = 101, height = 89, units = "mm")

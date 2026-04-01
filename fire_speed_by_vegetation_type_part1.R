@@ -166,202 +166,202 @@ for (i in 1:length(unique_id)){
 
 modis_summary <- do.call(rbind.data.frame, modis_list) %>% arrange(Ig_Date)
 str(modis_summary)
-# 
-# nlcd_class <- vector(length = nrow(viirs_summary))
-# row_list <- list()
-# 
-# for (i in 1:nrow(viirs_summary)){
-# 
-#   temp_df <- viirs_summary[i,]
-# 
-#   if (i == 1){ # This strategy requires the data to be in chronological order
-#     previous_year <- year(temp_df$Ig_Date)-1
-#     nlcd_fname <- paste0("NLCD/Annual_NLCD_LndCov_", as.character(previous_year), "_CU_C1V1.tif")
-#     nlcd <- raster(nlcd_fname)
-#   }
-# 
-#   if (i > 1){
-#     year_check <- year(temp_df$Ig_Date)-1
-#     if (year_check > previous_year){
-#       previous_year <- year_check
-#       nlcd_fname <- paste0("NLCD/Annual_NLCD_LndCov_", as.character(previous_year), "_CU_C1V1.tif")
-#       nlcd <- raster(nlcd_fname)
-#     }
-#   }
-#   
-#   geo_obj <- st_linestring(matrix(c(temp_df$x1, temp_df$y1, temp_df$x2, temp_df$y2), ncol = 2, byrow = TRUE))
-#   temp_geo <- st_sf(geometry = st_sfc(geo_obj, crs = 5070)) 
-#   
-#   #ggplot() + geom_sf(data = temp_geo)
-#   
-#   temp_geo_buffer <- st_buffer(temp_geo, dist = r/2) %>% st_transform(crs = crs_obj)
-#   
-#   # Extract the raster values around the buffered speed vector
-#   values_temp <- exact_extract(nlcd, temp_geo_buffer)[[1]] %>% drop_na()
-# 
-#   #N_total <- nrow(values_temp)
-# 
-#   colnames(values_temp) <- c("Pixel_Value", "coverage_fraction")
-#   
-#   N_total <- sum(values_temp$coverage_fraction)
-# 
-#   values_temp <- left_join(values_temp, nlcd_key, by = "Pixel_Value")
-# 
-#   values_df <- values_temp %>% group_by(NLCD_Class) %>% summarize(fraction = sum(coverage_fraction)/N_total)
-# 
-#   idx <- which.max(values_df$fraction)
-#   nlcd_class[i] <- values_df$NLCD_Class[idx]
-# 
-#   aug_df <- data.frame(NLCD_Class = nlcd_classes, fraction = 0) %>% dplyr::filter(!(NLCD_Class %in% values_df$NLCD_Class))
-# 
-#   class_df <- rbind.data.frame(values_df, aug_df) %>% arrange(NLCD_Class) %>% rbind.data.frame(data.frame(NLCD_Class = "N_total", fraction = N_total))
-# 
-#   row_temp <- class_df %>%
-#     pivot_wider(names_from = NLCD_Class, values_from = fraction) %>% mutate(New_ID = temp_df$New_ID)
-# 
-#   row_list[[i]] <- row_temp %>% arrange
-# 
-# }
-# 
-# viirs_df <- do.call(rbind.data.frame, row_list)
-# str(viirs_df)
-# 
-# 
-# viirs_class <- right_join(viirs_summary, viirs_df, by = "New_ID")
-# 
-# viirs_class$nlcd_class <- nlcd_class
-# 
-# str(viirs_class)
-# 
-# write.csv(viirs_class, "viirs_speed_veg_class.csv")
-# 
-# 
-# # Same for MODIS
-# 
-# nlcd_class <- vector(length = nrow(modis_summary))
-# row_list <- list()
-# 
-# for (i in 1:nrow(modis_summary)){
-#   
-#   temp_df <- modis_summary[i,]
-#   
-#   if (i == 1){ # This strategy requires the data to be in chronological order
-#     previous_year <- year(temp_df$Ig_Date)-1
-#     nlcd_fname <- paste0("NLCD/Annual_NLCD_LndCov_", as.character(previous_year), "_CU_C1V1.tif")
-#     nlcd <- raster(nlcd_fname)
-#   }
-#   
-#   if (i > 1){
-#     year_check <- year(temp_df$Ig_Date)-1
-#     if (year_check > previous_year){
-#       previous_year <- year_check
-#       nlcd_fname <- paste0("NLCD/Annual_NLCD_LndCov_", as.character(previous_year), "_CU_C1V1.tif")
-#       nlcd <- raster(nlcd_fname)
-#     }
-#   }
-#   
-#   geo_obj <- st_linestring(matrix(c(temp_df$x1, temp_df$y1, temp_df$x2, temp_df$y2), ncol = 2, byrow = TRUE))
-#   temp_geo <- st_sf(geometry = st_sfc(geo_obj, crs = 5070)) 
-#   
-#   #ggplot() + geom_sf(data = temp_geo)
-#   
-#   temp_geo_buffer <- st_buffer(temp_geo, dist = r/2) %>% st_transform(crs = crs_obj)
-#   
-#   # Extract the raster values around the buffered speed vector
-#   values_temp <- exact_extract(nlcd, temp_geo_buffer)[[1]] %>% drop_na()
-#   
-#   #N_total <- nrow(values_temp)
-#   
-#   colnames(values_temp) <- c("Pixel_Value", "coverage_fraction")
-#   
-#   N_total <- sum(values_temp$coverage_fraction)
-#   
-#   values_temp <- left_join(values_temp, nlcd_key, by = "Pixel_Value")
-#   
-#   values_df <- values_temp %>% group_by(NLCD_Class) %>% summarize(fraction = sum(coverage_fraction)/N_total)
-#   
-#   idx <- which.max(values_df$fraction)
-#   nlcd_class[i] <- values_df$NLCD_Class[idx]
-#   
-#   aug_df <- data.frame(NLCD_Class = nlcd_classes, fraction = 0) %>% dplyr::filter(!(NLCD_Class %in% values_df$NLCD_Class))
-#   
-#   class_df <- rbind.data.frame(values_df, aug_df) %>% arrange(NLCD_Class) %>% rbind.data.frame(data.frame(NLCD_Class = "N_total", fraction = N_total))
-#   
-#   row_temp <- class_df %>%
-#     pivot_wider(names_from = NLCD_Class, values_from = fraction) %>% mutate(New_ID = temp_df$New_ID)
-#   
-#   row_list[[i]] <- row_temp %>% arrange
-#   
-# }
-# 
-# modis_df <- do.call(rbind.data.frame, row_list)
-# 
-# 
-# modis_class <- right_join(modis_summary, modis_df, by = "New_ID")
-# 
-# modis_class$nlcd_class <- nlcd_class
-# 
-# str(modis_class)
-# 
-# write.csv(modis_class, "modis_speed_veg_class.csv")
-# 
-# 
-# nlcd_class <- vector(length = N_aqua)
-# row_list <- list()
-# 
-# for (i in 1:N_aqua){
-# 
-#   mtbs_temp <- mtbs_aqua[i,]
-# 
-#   if (i == 1){ # This strategy requires the data to be in chronological order
-#     previous_year <- year(mtbs_temp$Ig_Date)-1
-#     nlcd_fname <- paste0("NLCD/Annual_NLCD_LndCov_", as.character(previous_year), "_CU_C1V1.tif")
-#     nlcd <- raster(nlcd_fname)
-#   }
-# 
-#   if (i > 1){
-#     year_check <- year(mtbs_temp$Ig_Date)-1
-#     if (year_check > previous_year){
-#       previous_year <- year_check
-#       nlcd_fname <- paste0("NLCD/Annual_NLCD_LndCov_", as.character(previous_year), "_CU_C1V1.tif")
-#       nlcd <- raster(nlcd_fname)
-#     }
-#   }
-# 
-#   values_temp <- exact_extract(nlcd, mtbs_temp)[[1]] %>% drop_na()
-# 
-# 
-#   colnames(values_temp) <- c("Pixel_Value", "coverage_fraction")
-#   N_total <- sum(values_temp$coverage_fraction)
-# 
-#   values_temp <- left_join(values_temp, nlcd_key, by = "Pixel_Value")
-# 
-#   values_df <- values_temp %>% group_by(NLCD_Class) %>% summarize(fraction = sum(coverage_fraction)/N_total)
-# 
-#   idx <- which.max(values_df$fraction)
-#   nlcd_class[i] <- values_df$NLCD_Class[idx]
-# 
-#   aug_df <- data.frame(NLCD_Class = nlcd_classes, fraction = 0) %>% dplyr::filter(!(NLCD_Class %in% values_df$NLCD_Class))
-# 
-#   class_df <- rbind.data.frame(values_df, aug_df) %>% arrange(NLCD_Class) %>% rbind.data.frame(data.frame(NLCD_Class = "N_total", fraction = N_total))
-# 
-#   row_temp <- class_df %>%
-#     pivot_wider(names_from = NLCD_Class, values_from = fraction) %>% mutate(New_ID = mtbs_temp$New_ID)
-# 
-#   row_list[[i]] <- row_temp %>% arrange
-# 
-# }
-# 
-# row_df <- do.call(rbind.data.frame, row_list)
-# 
-# 
-# mtbs_class <- left_join(mtbs_aqua, row_df)
-# 
-# mtbs_class$nlcd_class <- nlcd_class
-# 
-# str(mtbs_class)
-# 
-# st_write(mtbs_class, "mtbs_veg_class.gpkg", append = FALSE)
+
+nlcd_class <- vector(length = nrow(viirs_summary))
+row_list <- list()
+
+for (i in 1:nrow(viirs_summary)){
+
+  temp_df <- viirs_summary[i,]
+
+  if (i == 1){ # This strategy requires the data to be in chronological order
+    previous_year <- year(temp_df$Ig_Date)-1
+    nlcd_fname <- paste0("NLCD/Annual_NLCD_LndCov_", as.character(previous_year), "_CU_C1V1.tif")
+    nlcd <- raster(nlcd_fname)
+  }
+
+  if (i > 1){
+    year_check <- year(temp_df$Ig_Date)-1
+    if (year_check > previous_year){
+      previous_year <- year_check
+      nlcd_fname <- paste0("NLCD/Annual_NLCD_LndCov_", as.character(previous_year), "_CU_C1V1.tif")
+      nlcd <- raster(nlcd_fname)
+    }
+  }
+
+  geo_obj <- st_linestring(matrix(c(temp_df$x1, temp_df$y1, temp_df$x2, temp_df$y2), ncol = 2, byrow = TRUE))
+  temp_geo <- st_sf(geometry = st_sfc(geo_obj, crs = 5070))
+
+  #ggplot() + geom_sf(data = temp_geo)
+
+  temp_geo_buffer <- st_buffer(temp_geo, dist = r/2) %>% st_transform(crs = crs_obj)
+
+  # Extract the raster values around the buffered speed vector
+  values_temp <- exact_extract(nlcd, temp_geo_buffer)[[1]] %>% drop_na()
+
+  #N_total <- nrow(values_temp)
+
+  colnames(values_temp) <- c("Pixel_Value", "coverage_fraction")
+
+  N_total <- sum(values_temp$coverage_fraction)
+
+  values_temp <- left_join(values_temp, nlcd_key, by = "Pixel_Value")
+
+  values_df <- values_temp %>% group_by(NLCD_Class) %>% summarize(fraction = sum(coverage_fraction)/N_total)
+
+  idx <- which.max(values_df$fraction)
+  nlcd_class[i] <- values_df$NLCD_Class[idx]
+
+  aug_df <- data.frame(NLCD_Class = nlcd_classes, fraction = 0) %>% dplyr::filter(!(NLCD_Class %in% values_df$NLCD_Class))
+
+  class_df <- rbind.data.frame(values_df, aug_df) %>% arrange(NLCD_Class) %>% rbind.data.frame(data.frame(NLCD_Class = "N_total", fraction = N_total))
+
+  row_temp <- class_df %>%
+    pivot_wider(names_from = NLCD_Class, values_from = fraction) %>% mutate(New_ID = temp_df$New_ID)
+
+  row_list[[i]] <- row_temp %>% arrange
+
+}
+
+viirs_df <- do.call(rbind.data.frame, row_list)
+str(viirs_df)
+
+
+viirs_class <- right_join(viirs_summary, viirs_df, by = "New_ID")
+
+viirs_class$nlcd_class <- nlcd_class
+
+str(viirs_class)
+
+write.csv(viirs_class, "viirs_speed_veg_class.csv")
+
+
+# Same for MODIS
+
+nlcd_class <- vector(length = nrow(modis_summary))
+row_list <- list()
+
+for (i in 1:nrow(modis_summary)){
+
+  temp_df <- modis_summary[i,]
+
+  if (i == 1){ # This strategy requires the data to be in chronological order
+    previous_year <- year(temp_df$Ig_Date)-1
+    nlcd_fname <- paste0("NLCD/Annual_NLCD_LndCov_", as.character(previous_year), "_CU_C1V1.tif")
+    nlcd <- raster(nlcd_fname)
+  }
+
+  if (i > 1){
+    year_check <- year(temp_df$Ig_Date)-1
+    if (year_check > previous_year){
+      previous_year <- year_check
+      nlcd_fname <- paste0("NLCD/Annual_NLCD_LndCov_", as.character(previous_year), "_CU_C1V1.tif")
+      nlcd <- raster(nlcd_fname)
+    }
+  }
+
+  geo_obj <- st_linestring(matrix(c(temp_df$x1, temp_df$y1, temp_df$x2, temp_df$y2), ncol = 2, byrow = TRUE))
+  temp_geo <- st_sf(geometry = st_sfc(geo_obj, crs = 5070))
+
+  #ggplot() + geom_sf(data = temp_geo)
+
+  temp_geo_buffer <- st_buffer(temp_geo, dist = r/2) %>% st_transform(crs = crs_obj)
+
+  # Extract the raster values around the buffered speed vector
+  values_temp <- exact_extract(nlcd, temp_geo_buffer)[[1]] %>% drop_na()
+
+  #N_total <- nrow(values_temp)
+
+  colnames(values_temp) <- c("Pixel_Value", "coverage_fraction")
+
+  N_total <- sum(values_temp$coverage_fraction)
+
+  values_temp <- left_join(values_temp, nlcd_key, by = "Pixel_Value")
+
+  values_df <- values_temp %>% group_by(NLCD_Class) %>% summarize(fraction = sum(coverage_fraction)/N_total)
+
+  idx <- which.max(values_df$fraction)
+  nlcd_class[i] <- values_df$NLCD_Class[idx]
+
+  aug_df <- data.frame(NLCD_Class = nlcd_classes, fraction = 0) %>% dplyr::filter(!(NLCD_Class %in% values_df$NLCD_Class))
+
+  class_df <- rbind.data.frame(values_df, aug_df) %>% arrange(NLCD_Class) %>% rbind.data.frame(data.frame(NLCD_Class = "N_total", fraction = N_total))
+
+  row_temp <- class_df %>%
+    pivot_wider(names_from = NLCD_Class, values_from = fraction) %>% mutate(New_ID = temp_df$New_ID)
+
+  row_list[[i]] <- row_temp %>% arrange
+
+}
+
+modis_df <- do.call(rbind.data.frame, row_list)
+
+
+modis_class <- right_join(modis_summary, modis_df, by = "New_ID")
+
+modis_class$nlcd_class <- nlcd_class
+
+str(modis_class)
+
+write.csv(modis_class, "modis_speed_veg_class.csv")
+
+
+nlcd_class <- vector(length = N_aqua)
+row_list <- list()
+
+for (i in 1:N_aqua){
+
+  mtbs_temp <- mtbs_aqua[i,]
+
+  if (i == 1){ # This strategy requires the data to be in chronological order
+    previous_year <- year(mtbs_temp$Ig_Date)-1
+    nlcd_fname <- paste0("NLCD/Annual_NLCD_LndCov_", as.character(previous_year), "_CU_C1V1.tif")
+    nlcd <- raster(nlcd_fname)
+  }
+
+  if (i > 1){
+    year_check <- year(mtbs_temp$Ig_Date)-1
+    if (year_check > previous_year){
+      previous_year <- year_check
+      nlcd_fname <- paste0("NLCD/Annual_NLCD_LndCov_", as.character(previous_year), "_CU_C1V1.tif")
+      nlcd <- raster(nlcd_fname)
+    }
+  }
+
+  values_temp <- exact_extract(nlcd, mtbs_temp)[[1]] %>% drop_na()
+
+
+  colnames(values_temp) <- c("Pixel_Value", "coverage_fraction")
+  N_total <- sum(values_temp$coverage_fraction)
+
+  values_temp <- left_join(values_temp, nlcd_key, by = "Pixel_Value")
+
+  values_df <- values_temp %>% group_by(NLCD_Class) %>% summarize(fraction = sum(coverage_fraction)/N_total)
+
+  idx <- which.max(values_df$fraction)
+  nlcd_class[i] <- values_df$NLCD_Class[idx]
+
+  aug_df <- data.frame(NLCD_Class = nlcd_classes, fraction = 0) %>% dplyr::filter(!(NLCD_Class %in% values_df$NLCD_Class))
+
+  class_df <- rbind.data.frame(values_df, aug_df) %>% arrange(NLCD_Class) %>% rbind.data.frame(data.frame(NLCD_Class = "N_total", fraction = N_total))
+
+  row_temp <- class_df %>%
+    pivot_wider(names_from = NLCD_Class, values_from = fraction) %>% mutate(New_ID = mtbs_temp$New_ID)
+
+  row_list[[i]] <- row_temp %>% arrange
+
+}
+
+row_df <- do.call(rbind.data.frame, row_list)
+
+
+mtbs_class <- left_join(mtbs_aqua, row_df)
+
+mtbs_class$nlcd_class <- nlcd_class
+
+str(mtbs_class)
+
+st_write(mtbs_class, "mtbs_veg_class.gpkg", append = FALSE)
 
 mtbs_class <- st_read("mtbs_veg_class.gpkg")
 str(mtbs_class)
