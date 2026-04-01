@@ -46,7 +46,7 @@ The following is a guide of where to find the script to generate each figure, ta
   * Script: dataset_comparison.R
   * Figure: dataset_comparison_panel.png
 * Table 1. Number of fires searched and analyzed from MTBS with respect to Aqua MODIS and Suomi NPP VIIRS
-  * Script: top_ten_fastest_fires.R
+  * Script: fire_speed_by_vegetation_type_part1.R 
 * Table 2. Number of fires in grasslands, shrublands, and forests for MTBS fires searched, MTBS fires with active fire pixel-derived perimeters, and MTBS fires with speed estimates from Aqua MODIS and Suomi NPP VIIRS
   * Script: fire_speed_by_vegetation_type_part1.R 
 * Table 3. Mean, median, 75th- and 95th-percentile fire speed (km h-1) by primary vegetation type along each fire’s maximum speed vector
