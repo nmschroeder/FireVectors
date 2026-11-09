@@ -58,15 +58,15 @@ The following is a guide of where to find the script to generate each figure, ta
   * Script: fire_speed_vs_FGR_comparison.R 
 * Figure S1. FireVectors algorithm
   * Created by Nicole Hemming-Schroeder using draw.io
-* Figure S2.
-  * Script:
-  * Figure:
-* Figure S3.
-  * Script:
-  * Figure:
-* Figure S4.
-  * Script:
-  * Figure:
+* Figure S2. Speed distribution by static convexity parameter
+  * Script: convexity_sensitivity.R
+  * Figure: speed_by_convexity_boxplots_tukey_hsd.png
+* Figure S3. Jaccard Index distribution of final fire perimeters derived from MODIS compared to NIROPS by static convexity parameter
+  * Script: convexity_sensitivity.R
+  * Figure: jaccard_by_convexity_boxplots_tukey_hsd.png
+* Figure S4. Jaccard Index of final fire perimeters derived from MODIS compared to NIROPS by convexity parameter and number of points
+  * Script: convexity_sensitivity.R
+  * Figure: jaccard_by_number_of_points.png
 * Figure S4. Maximum fire growth rate by EPA Level III ecoregion and map of fastest fires
   * Script: fire_behavior_by_ecoregion.R
   * Figure: ecoregion_maps_fastfires_fgr.png
