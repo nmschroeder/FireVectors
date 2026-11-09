@@ -1,5 +1,5 @@
 # FireVectors
-Repository for the FireVectors algorithm, data sets, and analyses
+Repository for the FireVectors algorithm, data sets, and analyses in revision at *Scientific Reports*
 
 # Fire progressions and speed data sets
 The primary products within FireVectors are the fire progression perimeters and associated speed vectors.
@@ -42,7 +42,10 @@ The following is a guide of where to find the script to generate each figure, ta
 * Figure 9. Comparison of fire speed derived from MODIS to fire speed derived from NIROPS
   * Script: nirops_comparison.R
   * Figure: modis_nirops_comparison.png
-* Figure 10. Comparison of selected published geospatial data sets for the 2018 Camp Fire
+* Figure 10. Comparison of selected published geospatial data sets with respect to area burned for all fires in the intersection (2020 California, N=34)
+  * Script:
+  * Figure:
+* Figure 11. Comparison of selected published geospatial data sets with respect to fire progression for an example fire (2020 River Fire; selected because it is the fastest of the fires from Figure 10)
   * Script: dataset_comparison.R
   * Figure: dataset_comparison_panel.png
 * Table 1. Number of fires searched and analyzed from MTBS with respect to Aqua MODIS and Suomi NPP VIIRS
@@ -55,10 +58,19 @@ The following is a guide of where to find the script to generate each figure, ta
   * Script: fire_speed_vs_FGR_comparison.R 
 * Figure S1. FireVectors algorithm
   * Created by Nicole Hemming-Schroeder using draw.io
-* Figure S2. Maximum fire growth rate by EPA Level III ecoregion and map of fastest fires
+* Figure S2.
+  * Script:
+  * Figure:
+* Figure S3.
+  * Script:
+  * Figure:
+* Figure S4.
+  * Script:
+  * Figure:
+* Figure S4. Maximum fire growth rate by EPA Level III ecoregion and map of fastest fires
   * Script: fire_behavior_by_ecoregion.R
   * Figure: ecoregion_maps_fastfires_fgr.png
-* Figure S3. Mean and trends in maximum fire growth rate per fire event by ecoregion
+* Figure S5. Mean and trends in maximum fire growth rate per fire event by ecoregion
   * Script: fire_behavior_by_ecoregion.R
   * Figure: ecoregion_maps_fgr.png 
 * Table S1. Number of fires and 95th-percentile speed by ecoregion and NLCD vegetation type
