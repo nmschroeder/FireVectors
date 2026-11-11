@@ -107,7 +107,7 @@ The following is a guide of where to find the script to generate each figure, ta
     * Computes fire speed between subsequent NIROPS fire progressions occurring between 0100 and 0900 UTC, inclusive
  * NIROPS speed comparison, part 5: HPC/fire_vectors_02_nirops.R
     * Collates results of fire_vectors_01_nirops.R into one data frame (burn_direction_nirops.csv)
- * Convexity fraction analysis: HPC/fire_vectors_01_sensitivity.R and HPC/fire_vectors_02_sensitivity.R
+ * Convexity fraction analysis: HPC/fire_vectors_01_sensitivity.R
 
 # Downloading ancillary files for figures, tables, and analyses
  * Please download LC20_Elev_220.tif elevation file from LANDFIRE and place in FireVectors directory
