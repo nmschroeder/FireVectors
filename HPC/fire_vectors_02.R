@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-# File to collate the outputs of viirs_01.R 
+# File to collate the outputs of fire_vectors_01.R 
 # These include burn direction vectors and fire perimeters for each available
 # time step
 # Nicole Hemming-Schroeder, October 10, 2024

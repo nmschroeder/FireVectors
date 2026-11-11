@@ -14,11 +14,11 @@ out_dir <- "/scratch/alpine/nihe1301/fire_speed"
 # Working directory
 wd <- "/home/nihe1301/fire_speed"
 
-# ## BEGIN LOCAL TROUBLESHOOTING (2026-02-23)
-# taskID <- 6212 # 4490 for North Start Fire (troubleshooting dAdt < 0 ); 6880 for Bolt Creek # 6212 for August Complex; 6347 for East Troublesome; 2075 for Zaca Fire (2007)
+# ## BEGIN LOCAL TROUBLESHOOTING
+# taskID <- 6179 # 4490 for North Start Fire; 6880 for Bolt Creek # 6212 for August Complex; 6347 for East Troublesome; 2075 for Zaca Fire (2007)
 # instrument <- "VIIRS"
-# satname <- "Aqua" # Use for computing speed (all VIIRS will be used for perims)
-# wd <- "~/Documents/R/fire_speed"
+# satname <- "N" # Use for computing speed (all VIIRS will be used for perims)
+# wd <- "~/Documents/R/FireVectors"
 # out_dir <- wd
 # 
 # ## END LOCAL TROUBLESHOOTING
@@ -32,7 +32,7 @@ print(satname)
 # compute the fire polygons and fire velocity for each fire
 
 # Nicole Hemming-Schroeder, October 10, 2024
-# Last updated August 26, 2025, 1:09 PM MDT
+# Last updated November 4, 2026, 3:53 PM
 
 library(sf)
 library(dplyr)
@@ -46,10 +46,10 @@ library(units)
 
 ################################ USER INPUTS ###################################
 
-# How many days before MTBS ignition date to look for active fire pixels?
+# How many days before MTBS ignition date to look for active fire detections?
 days_before <- 30
 
-# How many days after MTBS ignition date to look for active fire pixels?
+# How many days after MTBS ignition date to look for active fire detections?
 days_after <- 180
 
 # Data directory where active fire pixel data are located
@@ -68,11 +68,11 @@ spot_threshold <- 4000 # meters
 # By what fraction must a suggested fire path overlap the next fire perimeter?
 r_overlap <- 0.75
 
-# Number of active fire pixels required to intersect the final fire
+# Number of active fire detections required to intersect the final fire
 # perimeter
 n_pixel <- 4
 
-# Number of days with no active fire pixels before we end the fire
+# Number of days with no active fire detections before we end the fire
 N_days <- 14
 
 # Maximum number of clusters within a fire
@@ -94,7 +94,7 @@ ds <- res(elev)[1]
 setwd(wd)
 
 # Read in MTBS 
-fname_perims <- list.files(perimeter_dir, pattern = ".shp$", full.names = TRUE)
+fname_perims <- list.files(perimeter_dir, pattern = glob2rx("mtbs_wus_*.shp"), full.names = TRUE)
 
 # Pull the MTBS row corresponding to the task array
 final_perim <- st_read(fname_perims) %>% dplyr::filter(New_ID == taskID) %>% st_transform(crs = 4326) 
@@ -154,11 +154,18 @@ date2decimal <- function(date_string){
 }
 
 # Create a function to select a concavity ratio based on the number
-# of points in a cluster of active fire pixels
+# of points in a cluster of active fire detections
+# select_ratio <- function(n_points){
+#   r_val <- max(0.8*(0.25)^(n_points/600), 0.2)
+#   return(r_val)
+# }
+
+# Updated based on concavity sensitivity tests
 select_ratio <- function(n_points){
-  r_val <- max(0.8*(0.25)^(n_points/600), 0.2)
+  r_val <- max(0.8*(0.125)^((n_points-100)/1000), 0.1)
   return(r_val)
 }
+
 # # Troubleshooting elevation distance
 # L <- L_df[2,]
 # xy <- st_coordinates(L)[,1:2] %>% as.data.frame() %>% st_as_sf(coords = c("X", "Y"), crs =5070) 
@@ -420,7 +427,7 @@ if (any(null_check)){
 
 data_check <- do.call(c, data_check)
 
-## Are any of the rows at least one (are there any active fire pixels)
+## Are any of the rows at least one (are there any active fire detections)
 active_pixel <- any(data_check >= 1)
 
 # Group the close time entries together
@@ -433,6 +440,20 @@ if (nrow(data_list_df)>0){
   fire_data <- NA
   data_available <- 0
 }
+
+# # Troubleshooting - check dates for active fire detections
+# ggplot() + geom_sf(data = fire_data[862:nrow(fire_data),], mapping = aes(color = ACQ_DATETIME)) + 
+#   geom_sf(data = final_perim, fill = NA, lwd = 2) +
+#   scale_color_viridis_c(
+#     option = "A",
+#     labels = function(x) {
+#       format(as.POSIXct(x, origin = "1970-01-01"), "%b %d, %Y")
+#     }
+#   )
+# 
+# taskID
+# 
+# final_perim
 
 ## Check time information for the fire_data data set
 
@@ -466,15 +487,48 @@ if (data_available == 1){
     # Remove any results where the return is more than N_days since the last return
     day_check <- dt < 24*N_days
     date_check <- unique_dates <= final_perim$Ig_Date
-    idx <- day_check | date_check
     
-    for (i in 1:length(idx)){
-      if (any(!idx[1:i])){
-        idx[i] <- FALSE
+    # Not quite what we want; bug fix 2026-11-04
+    # idx <- day_check | date_check
+    # 
+    # for (i in 1:length(idx)){
+    #   if (any(!idx[1:i])){
+    #     idx[i] <- FALSE
+    #   }
+    # }
+    
+    
+    ig_date_idx <- which.min(date_check)
+    
+    # Initialize vector to note which dates of AFD data to keep
+    idx <- rep(TRUE, times = length(day_check))
+    
+    flag <- FALSE
+    # For each unique time stamp
+    for (i in 1:length(unique_dates)){
+      
+      # Handling AFD dates prior to the ignition date
+      if (i <= ig_date_idx){
+        # If we are on or before the ignition date, and the previous difference in pixel dates is greater
+        # than our allowance (given by N_days), then we're dropping those as a separate fire that occurred earlier
+        if (!day_check[i]){
+          idx[1:(i-1)] <- FALSE
+        }
+      }
+      
+      # Handling AFD dates on or after the ignition date
+      
+      if (i > ig_date_idx & !flag){
+        # If after the course of a continuous fire, there is a gap equal or more than N_days, we want to exclude
+        # the remaining fire returns and exit the loop
+        if (!day_check[i]){
+          idx[i:length(idx)]<- FALSE
+          flag <- TRUE
+        }
       }
     }
     
-    # Remove returns after the end date
+    # Remove returns from before and after the given fire
     unique_dates <- unique_dates[idx]
     N_dates <- length(unique_dates)
     
@@ -754,14 +808,14 @@ if (file.exists(pgon_output_name)){
 
 st_write(perim_df, pgon_output_name)
 
-# # Check the result
-# ggplot() + geom_sf(data = perim_df, fill = NA) +
-#   geom_sf(data = fire_data)
-  
+# View perimeters with active fire detections
+#ggplot() + geom_sf(data = perim_df, fill = NA, mapping = aes(color = summary_date)) + #geom_sf(data = fire_data, mapping = aes(color = ACQ_DATETIME)) + 
+#  facet_wrap(~summary_date)
 
+  
 # Next we compute the speed between subsequent polygons... in this code
 # we want to pick (at least for now) polygons that are approximately matching
-# intervals apart with respect to MODIS active fire pixels...
+# intervals apart with respect to MODIS active fire detections...
 # So in the case of MODIS, let's use Aqua (SATELLITE == 'Aqua'), and in the case 
 # of VIIRS, let's use Suomi NPP (SATELLITE == 'N'). Let's specify these in
 # satname, so we will filter for SATELLITE == satname
@@ -1055,6 +1109,24 @@ if (data_available == 1 & exists("N_perim")){
           # Now we have an array of the minimum distances between each point in 
           # Y and each starting perimeter Xp
           
+          # In addition to finding the maximum speed vector, let's all collect
+          # some percentile distances (and convert m to km) 2026-11-04 NHS
+          # Better check 100 as well since these vectors get adjusted for various
+          # reasons
+          d_xy_100 <- quantile(D_min_by_yloc, 1.00)*1e-3
+          d_xy_098 <- quantile(D_min_by_yloc, 0.98)*1e-3
+          d_xy_095 <- quantile(D_min_by_yloc, 0.95)*1e-3
+          d_xy_090 <- quantile(D_min_by_yloc, 0.90)*1e-3
+          d_xy_085 <- quantile(D_min_by_yloc, 0.85)*1e-3
+          d_xy_080 <- quantile(D_min_by_yloc, 0.80)*1e-3
+          d_xy_075 <- quantile(D_min_by_yloc, 0.75)*1e-3
+
+          d_xy_050 <- quantile(D_min_by_yloc, 0.50)*1e-3
+          d_xy_025 <- quantile(D_min_by_yloc, 0.25)*1e-3
+          d_xy_000 <- quantile(D_min_by_yloc, 0.00)*1e-3
+          d_xy_avg <- mean(D_min_by_yloc)*1e-3
+          N_dist <- nrow(D_min_by_yloc)
+          
           # Now we want the MAXIMUM of these minima to find the fastest rate 
           # of spread
           fastest_jk <- which(D_min_by_yloc == max(D_min_by_yloc), arr.ind = TRUE)
@@ -1169,7 +1241,7 @@ if (data_available == 1 & exists("N_perim")){
           x2 <- xy2[1]
           y2 <- xy2[2]
           
-          temp_df <- data.frame(x1, y1, x2, y2, time_start, time_end, dt, dA, dAdt, d_xy, v_xy, d_elev, v_elev, spot = spot_check, burn_avail = TRUE)
+          temp_df <- data.frame(x1, y1, x2, y2, time_start, time_end, dt, dA, dAdt, d_xy, v_xy, d_elev, v_elev, d_xy_100, d_xy_098, d_xy_095, d_xy_090, d_xy_085, d_xy_080, d_xy_075, d_xy_050, d_xy_025, d_xy_000, d_xy_avg, N_dist, spot = spot_check, burn_avail = TRUE)
           
           fire_spread_list[[count]] <- temp_df
           
@@ -1211,6 +1283,18 @@ if (!(exists("vector_flag"))){
                                time_mean = NA,
                                dt = NA,
                                d_xy = NA,
+                               d_xy_100 = NA,
+                               d_xy_098 = NA,
+                               d_xy_095 = NA,
+                               d_xy_090 = NA,
+                               d_xy_085 = NA,
+                               d_xy_080 = NA,
+                               d_xy_075 = NA,
+                               d_xy_050 = NA,
+                               d_xy_025 = NA,
+                               d_xy_000 = NA,
+                               d_xy_avg = NA,
+                               N_dist = NA,
                                v_xy = NA,
                                d_elev = NA,
                                v_elev = NA,

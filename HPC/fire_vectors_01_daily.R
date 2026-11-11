@@ -155,10 +155,18 @@ date2decimal <- function(date_string){
 
 # Create a function to select a concavity ratio based on the number
 # of points in a cluster of active fire pixels
+#select_ratio <- function(n_points){
+#  r_val <- max(0.8*(0.25)^(n_points/600), 0.2)
+#  return(r_val)
+#}
+
+# Updated based on concavity sensitivity tests 2026-11-06
 select_ratio <- function(n_points){
-  r_val <- max(0.8*(0.25)^(n_points/600), 0.2)
+  r_val <- max(0.8*(0.125)^((n_points-100)/1000), 0.1)
   return(r_val)
 }
+
+
 # # Troubleshooting elevation distance
 # L <- L_df[2,]
 # xy <- st_coordinates(L)[,1:2] %>% as.data.frame() %>% st_as_sf(coords = c("X", "Y"), crs =5070) 
@@ -466,11 +474,42 @@ if (data_available == 1){
     # Remove any results where the return is more than N_days since the last return
     day_check <- dt < 24*N_days
     date_check <- unique_dates <= final_perim$Ig_Date
-    idx <- day_check | date_check
     
-    for (i in 1:length(idx)){
-      if (any(!idx[1:i])){
-        idx[i] <- FALSE
+    #idx <- day_check | date_check
+    
+    #for (i in 1:length(idx)){
+    #  if (any(!idx[1:i])){
+    #    idx[i] <- FALSE
+    #  }
+    #}
+
+    ig_date_idx <- which.min(date_check)
+    
+    # Initialize vector to note which dates of AFD data to keep
+    idx <- rep(TRUE, times = length(day_check))
+    
+    flag <- FALSE
+    # For each unique time stamp
+    for (i in 1:length(unique_dates)){
+      
+      # Handling AFD dates prior to the ignition date
+      if (i <= ig_date_idx){
+        # If we are on or before the ignition date, and the previous difference in pixel dates is greater
+        # than our allowance (given by N_days), then we're dropping those as a separate fire that occurred earlier
+        if (!day_check[i]){
+          idx[1:(i-1)] <- FALSE
+        }
+      }
+      
+      # Handling AFD dates on or after the ignition date
+      
+      if (i > ig_date_idx & !flag){
+        # If after the course of a continuous fire, there is a gap equal or more than N_days, we want to exclude
+        # the remaining fire returns and exit the loop
+        if (!day_check[i]){
+          idx[i:length(idx)]<- FALSE
+          flag <- TRUE
+        }
       }
     }
     
