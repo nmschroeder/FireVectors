@@ -43,8 +43,8 @@ The following is a guide of where to find the script to generate each figure, ta
   * Script: nirops_comparison.R
   * Figure: modis_nirops_comparison.png
 * Figure 10. Comparison of selected published geospatial data sets with respect to area burned for all fires in the intersection (2020 California, N=34)
-  * Script:
-  * Figure:
+  * Script: dataset_comparison.R
+  * Figure: data_comparison_area_by_date.png
 * Figure 11. Comparison of selected published geospatial data sets with respect to fire progression for an example fire (2020 River Fire; selected because it is the fastest of the fires from Figure 10)
   * Script: dataset_comparison.R
   * Figure: dataset_comparison_panel.png
@@ -107,6 +107,7 @@ The following is a guide of where to find the script to generate each figure, ta
     * Computes fire speed between subsequent NIROPS fire progressions occurring between 0100 and 0900 UTC, inclusive
  * NIROPS speed comparison, part 5: HPC/fire_vectors_02_nirops.R
     * Collates results of fire_vectors_01_nirops.R into one data frame (burn_direction_nirops.csv)
+ * Convexity fraction analysis: HPC/fire_vectors_01_sensitivity.R and HPC/fire_vectors_02_sensitivity.R
 
 # Downloading ancillary files for figures, tables, and analyses
  * Please download LC20_Elev_220.tif elevation file from LANDFIRE and place in FireVectors directory
