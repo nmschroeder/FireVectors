@@ -8,6 +8,7 @@ library(exactextractr)
 library(lme4)
 library(viridis)
 library(cowplot)
+library(flextable)
 
 # Set the environment to read everything in as UTC
 Sys.setenv(TZ = "UTC")
@@ -40,11 +41,17 @@ modis_aqua <- dplyr::filter(modis, SATELLITE == "Aqua") %>% arrange(ACQ_DATE)
 
 start_date <- modis_aqua[1,]$ACQ_DATE
 
-mtbs_aqua <- dplyr::filter(mtbs, Ig_Date >= start_date) %>% arrange(Ig_Date)
+mtbs_aqua <- dplyr::filter(mtbs, Ig_Date >= start_date, Incid_Type == "Wildfire") %>% arrange(Ig_Date)
 
 ## Table 1 Values BEGIN
 
-N_aqua <- nrow(mtbs_aqua) #6794 within a valid time frame
+MODIS <- rep(NA, times = 3)
+VIIRS <- rep(NA, times = 3)
+Overlap <- rep(NA, times = 3)
+
+N_aqua <- nrow(mtbs_aqua) 
+
+MODIS[1] <- N_aqua
 
 # Read in VIIRS to check first valid potential date for MTBS perimeters
 viirs <- st_read("FIRMS/western_us_fire_archive_SV-C2_608992.shp")
@@ -64,11 +71,13 @@ viirs_check <- viirs_check %>% arrange(ACQ_DATE)
 
 viirs_start_date <- viirs[1,]$ACQ_DATE
 
-mtbs_snpp <- dplyr::filter(mtbs, Ig_Date >= viirs_start_date) %>% arrange(Ig_Date)
+mtbs_snpp <- dplyr::filter(mtbs, Ig_Date >= viirs_start_date, Incid_Type == "Wildfire") %>% arrange(Ig_Date)
 
 N_snpp <- nrow(mtbs_snpp)
 N_snpp
 
+VIIRS[1] <- N_snpp
+Overlap[1] <- N_snpp
 # Next, let's look at how many unique fires from MTBS have MODIS and VIIRS active
 # fire pixels (for Aqua and Suomi-NPP only, since these are the ones for which
 # we generated speed)
@@ -77,42 +86,80 @@ modis_afp <- st_read("data/active_fire_pixel_data_modis.geojson")
 viirs_afp <- st_read("data/active_fire_pixel_data_viirs.geojson")
 
 # Check how many unique MTBS fires have associated active fire pixels
-modis_afp_aqua <- dplyr::filter(modis_afp, SATELLITE == "Aqua")
-#str(modis_afp_aqua)
+modis_afp_aqua <- dplyr::filter(modis_afp, SATELLITE == "Aqua", New_ID %in% mtbs_aqua$New_ID)
+
 
 aqua_unique <- unique(modis_afp_aqua$New_ID)
 
-length(aqua_unique)
+MODIS[2] <- length(aqua_unique)
+
 
 # Check how many unique MTBS fires have associated active fire pixels
-viirs_afp_snpp <- dplyr::filter(viirs_afp, SATELLITE == "N")
+viirs_afp_snpp <- dplyr::filter(viirs_afp, SATELLITE == "N", New_ID %in% mtbs_aqua$New_ID)
 #str(viirs_afp_snpp)
 
 snpp_unique <- unique(viirs_afp_snpp$New_ID)
 
 length(snpp_unique)
 
+VIIRS[2] <- length(snpp_unique)
+
+
+
 # How many overlap? These should be the same... right?
 
-sum(snpp_unique %in% aqua_unique)
+b1 <- sum(snpp_unique %in% aqua_unique)
 
-sum(aqua_unique %in% snpp_unique)
+b2 <- sum(aqua_unique %in% snpp_unique)
+
+if (b1 == b2){
+  Overlap[2] <- b1
+} else{
+  print('The active fire detection counts for the overlap do not match')
+}
 
 # Next, we want to know how many unique MTBS perimeters have speed estimates
 # (These are already filtered for Aqua and Suomi-NPP)
 viirs_speed <- read.csv("data/burn_direction_viirs.csv")
 modis_speed <- read.csv("data/burn_direction_modis.csv")
 
-viirs_speed_unique <- viirs_speed %>% dplyr::filter(!is.na(v_xy)) %>% pull(New_ID) %>% unique()
+viirs_speed_unique <- viirs_speed %>% dplyr::filter(!is.na(v_xy), New_ID %in% mtbs_aqua$New_ID) %>% pull(New_ID) %>% unique()
 length(viirs_speed_unique)
 
-modis_speed_unique <- modis_speed %>% dplyr::filter(!is.na(v_xy)) %>% pull(New_ID) %>% unique()
+VIIRS[3] <- length(viirs_speed_unique)
+
+modis_speed_unique <- modis_speed %>% dplyr::filter(!is.na(v_xy), New_ID %in% mtbs_aqua$New_ID) %>% pull(New_ID) %>% unique()
 length(modis_speed_unique)
 
-# Check overlap
-sum(viirs_speed_unique %in% modis_speed_unique)
-sum(modis_speed_unique %in% viirs_speed_unique)
+MODIS[3] <- length(modis_speed_unique)
 
+# Check overlap
+c1 <- sum(viirs_speed_unique %in% modis_speed_unique)
+c2 <- sum(modis_speed_unique %in% viirs_speed_unique)
+
+if (c1 == c2){
+  Overlap[3] <- c1
+} else{
+  print('The speed estimate counts for the overlap do not match')
+}
+
+
+# Create Table 1
+data.frame(
+  N_fires = c("Number of MTBS fires searched", 
+              "Number of MTBS fires with active fire detections", 
+              "Number of MTBS fires with speed estimates"),
+  MODIS,
+  VIIRS,
+  Overlap) %>%
+  flextable() %>%
+  theme_booktabs() %>%
+  set_header_labels(
+    N_fires = " ") %>%
+  font(fontname = "Arial", part = "all") %>%
+  fontsize(size = 11, part = "all") %>%
+  save_as_docx(path = "Table_01.docx")
+  
 ## Table 1 Values END
 
 # Let's find out the primary class for each of these MTBS perimeters that
@@ -124,6 +171,8 @@ r <- res(nlcd) %>% min()
 crs_obj <- st_crs(nlcd)
 
 str(nlcd_info)
+
+nlcd_info$Pixel_Value <- nlcd_info$ID
 
 nlcd_names <- colnames(nlcd_info) %>% gsub(pattern = " ", replacement = "_", x = .)
 colnames(nlcd_info) <- nlcd_names
@@ -374,40 +423,46 @@ length(unique(mtbs_class$New_ID))
 # Determine how many MTBS perimeters during the Aqua collection time are in each
 # veg. category
 mtbs_class_aqua <- dplyr::filter(mtbs_class, New_ID %in% mtbs_aqua$New_ID)
-table(mtbs_class_aqua$nlcd_class)
+r1 <- table(mtbs_class_aqua$nlcd_class)
 
 # Determine which land types have active fire pixels Aqua MODIS
-mtbs_class %>% dplyr::filter(New_ID %in% aqua_unique) %>% pull(nlcd_class) %>% table()
+r2 <- mtbs_class %>% dplyr::filter(New_ID %in% aqua_unique) %>% pull(nlcd_class) %>% table()
 
 # Determine which land types have speed estimates
-mtbs_class %>% dplyr::filter(New_ID %in% modis_speed_unique) %>% pull(nlcd_class) %>% table()
+r3 <- mtbs_class %>% dplyr::filter(New_ID %in% modis_speed_unique) %>% pull(nlcd_class) %>% table()
+
+table_part1 <- bind_rows(r1, r2, r3) %>% select(Forest, Shrubland, Herbaceous) %>% rename(Grassland = Herbaceous)
+
+table_part1 %>% 
+  flextable() %>%
+  theme_booktabs() %>%
+  set_header_labels(
+    N_fires = " ") %>%
+  font(fontname = "Arial", part = "all") %>%
+  fontsize(size = 11, part = "all") %>%
+  save_as_docx(path = "Table_02_part2.docx")
 
 # Do the same calculations for VIIRS (Suomi-NPP)
 mtbs_class_snpp <- dplyr::filter(mtbs_class, New_ID %in% mtbs_snpp$New_ID)
-table(mtbs_class_snpp$nlcd_class)
+r4 <- table(mtbs_class_snpp$nlcd_class)
 
 # Determine which land types have active fire pixels Aqua MODIS
-mtbs_class %>% dplyr::filter(New_ID %in% snpp_unique) %>% pull(nlcd_class) %>% table()
+r5 <- mtbs_class %>% dplyr::filter(New_ID %in% snpp_unique) %>% pull(nlcd_class) %>% table()
 
 # Determine which land types have speed estimates
-mtbs_class %>% dplyr::filter(New_ID %in% viirs_speed_unique) %>% pull(nlcd_class) %>% table()
+r6 <- mtbs_class %>% dplyr::filter(New_ID %in% viirs_speed_unique) %>% pull(nlcd_class) %>% table()
 
-modis_valid <- modis_speed %>% dplyr::filter(!is.na(v_xy))
+table_part2 <- bind_rows(r4, r5, r6) %>% select(Forest, Shrubland, Herbaceous) %>% rename(Grassland = Herbaceous)
 
-mtbs_valid <- dplyr::filter(mtbs_class, New_ID %in% modis_speed_unique)
-mtbs_valid
+table_part2 %>% 
+  flextable() %>%
+  theme_booktabs() %>%
+  set_header_labels(
+    N_fires = " ") %>%
+  font(fontname = "Arial", part = "all") %>%
+  fontsize(size = 11, part = "all") %>%
+  save_as_docx(path = "Table_02_part2.docx")
 
-modis_valid_unique <- modis_valid %>% group_by(New_ID) %>% summarize(max_v_xy = max(v_xy, na.rm = TRUE))
-
-mtbs_speed <- left_join(mtbs_valid, modis_valid_unique, by = "New_ID")
-
-table_valid <- table(mtbs_valid$nlcd_class)
-
-#table_total
-table_valid
-
-#table_total/sum(table_total)
-table_valid/sum(table_valid)
 
 ## Calculations for Table 2 - END
 
@@ -498,3 +553,46 @@ for (i in 1:length(unique_ecoregions)){
 
 ecoregion_df <- do.call(rbind.data.frame, eco_list) %>% arrange(desc(N))
 ecoregion_df
+
+ecoregion_df$veg_fastest <- ecoregion_df$q95_max
+
+idx <- which(ecoregion_df$q95_max == "Herbaceous")
+ecoregion_df$veg_fastest[idx] <- "Grass"
+
+idx2 <- which(ecoregion_df$q95_max == "Shrubland")
+ecoregion_df$veg_fastest[idx2] <- "Shrub"
+
+str(ecoregion_df)
+
+# Flex table for a cleaned up Table S1
+ecoregion_df %>%
+  dplyr::select(ecoregion, N, N_f, F95, N_s, S95, N_g, G95, veg_fastest) %>% 
+  flextable() %>%
+  colformat_double(digits = 2) %>%
+  theme_booktabs() %>%
+  set_header_labels(
+    ecoregion = "Ecoregion",
+    N = "N",
+    N_f = "N_forest",
+    F95 = "95th Forest",
+    N_s = "N_shrub",
+    S95 = "95th Shrub",
+    N_g = "N_grass",
+    G95 = "95th Grass",
+    veg_fastest = "Fastest 95th"
+  ) %>%
+  flextable::compose(
+    j = "N_f", part = "header",
+    value = as_paragraph("N", as_sub("forest"))
+  ) %>%
+  flextable::compose(
+    j = "N_s", part = "header",
+    value = as_paragraph("N", as_sub("shrub"))
+  ) %>%
+  flextable::compose(
+    j = "N_g", part = "header",
+    value = as_paragraph("N", as_sub("grass"))
+  ) %>%
+  font(fontname = "Arial", part = "all") %>%
+  fontsize(size = 11, part = "all") %>%
+  save_as_docx(path = "Table_S1.docx")

@@ -241,13 +241,16 @@ summary(area_compare)
 R2 <- summary(area_compare)$r.squared
 linearHypothesis(area_compare, "modis_area_m2 = 1")
 
+max_final_area <- max(quantile(summary_df$modis_area_m2*1e-6, 1.0, na.rm = TRUE), quantile(summary_df$viirs_area_m2*1e-6, 1.0, na.rm = TRUE))
+
+
 p_compare_final_area <- ggplot() + geom_point(data = summary_df, mapping = aes(x = modis_area_m2*1e-6, y = viirs_area_m2*1e-6), alpha = 0.5) + 
   geom_abline(slope = 1, intercept = 0, color = 'red') +
-  xlim(c(0, 6200)) +
-  ylim(c(0, 6200)) +
+  xlim(c(0, 1.01*max_final_area)) +
+  ylim(c(0, 1.01*max_final_area)) +
   xlab(expression("MODIS Final Area (km"^2*")")) +
   ylab(expression("VIIRS Final Area (km"^2*")")) +
-  annotate("text", x = 0, y = 6076, 
+  annotate("text", x = 0, y = 0.95*max_final_area, 
            label = sprintf("R^2 == %.2f", R2),
            parse = TRUE,
            hjust = 0, size = 5) +
@@ -255,7 +258,7 @@ p_compare_final_area <- ggplot() + geom_point(data = summary_df, mapping = aes(x
   theme(aspect.ratio = 1) +
   ggh4x::force_panelsizes(rows = unit(2.2, "in"), cols = unit(2.5, "in"))
 
-#p_compare_final_area
+p_compare_final_area
 
 #ggsave("modis_viirs_final_area_comparison.png", plot = p_compare_final_area, dpi = 600, width = 3.5, height = 3.5)
 
@@ -275,19 +278,21 @@ summary(lm_v_xy)
 
 linearHypothesis(lm_v_xy, "viirs_max_v_xy = 1")
 
+max_speed <- max(quantile(summary_df$modis_max_v_xy, 1.0, na.rm = TRUE), quantile(summary_df$viirs_max_v_xy, 1.0, na.rm = TRUE))
+
 p_compare_max_speed <- ggplot(data = summary_df) + geom_point(mapping = aes(x = modis_max_v_xy, y = viirs_max_v_xy), alpha = 0.5) + geom_abline(slope = 1, intercept = 0, color = 'red') +
-  xlim(c(0, 3.5)) +
-  ylim(c(0, 3.5)) +
+  xlim(c(0, 1.01*max_speed)) +
+  ylim(c(0, 1.01*max_speed)) +
   xlab(expression("MODIS Max Speed (kph)")) +
   ylab(expression("VIIRS Max Speed (kph)")) +
-  annotate("text", x = 0, y = 3.43, 
+  annotate("text", x = 0, y = 0.95*max_speed, 
            label = sprintf("R^2 == %.2f", R2_2),
            parse = TRUE,
            hjust = 0, size = 5) +
   coord_equal() +
   theme(aspect.ratio = 1) +
   ggh4x::force_panelsizes(rows = unit(2.2, "in"), cols = unit(2.5, "in"))
-#p_compare_max_speed  
+p_compare_max_speed  
 #ggsave("viirs_modis_max_speed_comparison.png", dpi = 600, height = 3, width = 3, units = "in")
 
 
@@ -295,23 +300,25 @@ lm_dA <- lm(modis_max_dA ~ viirs_max_dA + 0, data = summary_df)
 summary(lm_dA)
 R2_dA <- summary(lm_dA)$r.squared
 
+max_val <- max(quantile(summary_df$modis_max_dA*1e-6, 1.0, na.rm = TRUE), quantile(summary_df$viirs_max_dA*1e-6, 1.0, na.rm = TRUE))
+
 p_compare_max_fgr <- ggplot(data = summary_df) + 
   geom_point(mapping = aes(x = modis_max_dA*1e-6, 
                            y = viirs_max_dA*1e-6), 
              alpha = 0.5) + 
   geom_abline(slope = 1, intercept = 0, color = 'red') +
-  xlim(0, 50) +
-  ylim(0, 50) + 
+  xlim(0, 1.01*max_val) +
+  ylim(0, 1.01*max_val) + 
   labs(x = expression("MODIS Max FGR (" * km^2 * "/hr)"),
        y = expression("VIIRS Max FGR (" * km^2 * "/hr)")) +
-  annotate("text", x = 0, y = 49, 
+  annotate("text", x = 0, y = 0.95*max_val, 
            label = sprintf("R^2 == %.2f", R2_dA),
            parse = TRUE,
            hjust = 0, size = 5) +
   coord_equal() +
   theme(aspect.ratio = 1) +
   ggh4x::force_panelsizes(rows = unit(2.2, "in"), cols = unit(2.5, "in"))
-#p_compare_max_fgr
+p_compare_max_fgr
 
 p_compare <- plot_grid(p_compare_final_area, p_compare_max_speed, p_compare_max_fgr, nrow = 1, align = "hv", labels = c("a.", "b.", "c."), label_fontface = "plain")
 ggsave("modis_vs_viirs_comparison_panel.png", plot = p_compare, width = 9.5, height = 3, units = "in", bg = "white")

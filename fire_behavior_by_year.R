@@ -147,7 +147,7 @@ for (i in 1:nrow(quantile_df)){
 p1 <- ggplot() + geom_point(data = quantile_df, mapping = aes(x = year, y = speed)) +
   xlab("Year") + ylab("95th-Percentile Speed (km h\u207B\u00B9)") +
   ggh4x::force_panelsizes(rows = unit(2.2, "in"), cols = unit(2.5, "in")) +
-  ylim(c(-0.1, 3.1))
+  ylim(c(-0.1, 1.02*max(quantile_df$speed)))
 
 #ggsave("fire_speed_by_time_95th_percentile.png", plot = p1, dpi = 600, width = 3.5, height = 3)
 
@@ -160,6 +160,7 @@ fire_fgr_modis <- modis %>% group_by(New_ID) %>% arrange(time_start) %>% summari
 
 fire_fgr_modis$year <- decimal_date(fire_fgr_modis$date)
 
+# Checking for overall fire growth rate trend
 fgr_check <- lm(fgr_max ~ year, data = fire_fgr_modis)
 summary(fgr_check)
 
@@ -174,6 +175,7 @@ for (i in 1:nrow(fgr_df)){
 
 fgr_df
 
+# Checking for 95th-percentile trend
 test_fgr <- lm(fgr_km2 ~ year, data = fgr_df)
 summary(test_fgr)
 
@@ -181,15 +183,13 @@ summary(test_fgr)
 p2 <- ggplot() + geom_point(data = fgr_df, mapping = aes(x = year, y = fgr_km2)) +
   xlab("Year") + ylab("95th-Percentile Growth Rate (km\u00B2 h\u207B\u00B9)") +
   ggh4x::force_panelsizes(rows = unit(2.2, "in"), cols = unit(2.5, "in")) +
-  geom_abline(intercept = coefficients(test_fgr)[1], slope = coefficients(test_fgr)[2]) +
-  ylim(c(-1, 26))
+  #geom_abline(intercept = coefficients(test_fgr)[1], slope = coefficients(test_fgr)[2]) +
+  ylim(c(-1, 1.02*max(fgr_df$fgr_km2)))
 
 #ggsave("fire_fgr_by_time_95th_percentile.png", plot = p2, dpi = 600, width = 3.5, height = 3)
 
 fire_trends_panel <- plot_grid(p1, NULL, p2, ncol = 3, rel_widths = c(1, -0.05, 1), align = "hv", labels = c("a.", " ", "b."), axis = "tblr", label_fontface = "plain")
 fire_trends_panel
-
-
 
 ggsave("fire_trends_panel.png", plot = fire_trends_panel, dpi = 600, width = 7.5, height = 3, bg = "white")
 

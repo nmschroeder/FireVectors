@@ -241,14 +241,16 @@ summary(m)
 
 R2 <- summary(m)$r.squared
 
+max_val <- max(quantile(summary_df$max_speed_nirops, 1.0, na.rm = TRUE), quantile(summary_df$max_speed_modis, 1.0, na.rm = TRUE))
+
 ggplot() + geom_point(data = summary_df, mapping = aes(x = max_speed_nirops, y = max_speed_modis), alpha = 0.5) + 
   geom_abline(slope = 1, intercept = 0, color = 'red') + 
-  xlim(c(-0.01, 1.2)) +
-  ylim(c(-0.01, 1.2)) +
+  xlim(c(-0.01, 1.01*max_val)) +
+  ylim(c(-0.01, 1.01*max_val)) +
   xlab("NIROPS Daily Max. Speed (km h\u207B\u00B9)") +
   ylab("FireVectors (MODIS) Daily Max. Speed (km h\u207B\u00B9)") +
-  annotate("text", x = 0, y = 0.2, 
-           label = sprintf("R^2 == %.2f", R2),
+  annotate("text", x = 0, y = 0.95*max_val, 
+           label = sprintf('R^2 == "%.2f"', R2),
            parse = TRUE,
            hjust = 0, size = 5) +
   coord_equal()

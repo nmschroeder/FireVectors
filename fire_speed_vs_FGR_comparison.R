@@ -1,3 +1,6 @@
+# Dependency to run fire_speed_by_vegetation_type_part1.R and
+# fire_speed_by_vegetation_type_part2.R first
+
 library(ggplot2)
 library(dplyr)
 library(sf)

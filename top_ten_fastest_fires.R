@@ -22,29 +22,33 @@ modis <- read.csv("data/burn_direction_modis.csv") %>% dplyr::filter(burn_avail 
 viirs_pixels <- st_read("data/active_fire_pixel_data_viirs.geojson")
 modis_pixels <- st_read("data/active_fire_pixel_data_modis.geojson")
 
-# Table 1
-ids_pixel_events_modis <- unique(modis_pixels$New_ID)
-N_pixel_events_modis <- length(ids_pixel_events_modis)
+# Check for prescribed fires
+idx <- which(modis_perims$New_ID %in% modis$New_ID)
 
-ids_pixel_events_viirs <- unique(viirs_pixels$New_ID)
-N_pixel_events_viirs <- length(ids_pixel_events_viirs)
+# Verify update to only include the "Wildfire" incident type in these analyses
+check_perims <- modis_perims[idx,]
+unique(check_perims$Incid_Type)
 
-N_overlap <- sum(ids_pixel_events_viirs %in% ids_pixel_events_modis)
-
-modis_test <- modis_pixels %>% dplyr::filter(SATELLITE == "Aqua") %>% group_by(New_ID) %>% summarize(N_dates = length(unique(ACQ_DATETIME)))
-str(modis_test)
-
-N_speed_verify <- modis_test %>% dplyr::filter(N_dates > 1) %>% nrow()
-
-viirs_test <- viirs_pixels %>% dplyr::filter(SATELLITE == "N") %>% group_by(New_ID) %>% summarize(N_dates = length(unique(ACQ_DATETIME)))
-str(viirs_test)
-
-N_overlap_by_sat <- sum(viirs_test$New_ID %in% modis_test$New_ID)
-
-N_speed_verify_viirs <- viirs_test %>% dplyr::filter(N_dates > 1) %>% nrow()
-
-# Which event IDs are missing from the burn direction data set despite having multiple returns from our satellites of interest?
-
+# # Table 1
+# ids_pixel_events_modis <- unique(modis_pixels$New_ID)
+# N_pixel_events_modis <- length(ids_pixel_events_modis)
+# 
+# ids_pixel_events_viirs <- unique(viirs_pixels$New_ID)
+# N_pixel_events_viirs <- length(ids_pixel_events_viirs)
+# 
+# N_overlap <- sum(ids_pixel_events_viirs %in% ids_pixel_events_modis)
+# 
+# modis_test <- modis_pixels %>% dplyr::filter(SATELLITE == "Aqua") %>% group_by(New_ID) %>% summarize(N_dates = length(unique(ACQ_DATETIME)))
+# str(modis_test)
+# 
+# N_speed_verify <- modis_test %>% dplyr::filter(N_dates > 1) %>% nrow()
+# 
+# viirs_test <- viirs_pixels %>% dplyr::filter(SATELLITE == "N") %>% group_by(New_ID) %>% summarize(N_dates = length(unique(ACQ_DATETIME)))
+# str(viirs_test)
+# 
+# N_overlap_by_sat <- sum(viirs_test$New_ID %in% modis_test$New_ID)
+# 
+# N_speed_verify_viirs <- viirs_test %>% dplyr::filter(N_dates > 1) %>% nrow()
 
 
 theme_set(
@@ -180,7 +184,7 @@ for (i in 1:N){
                  mapping = aes(x = x1, xend = x2, y = y1, yend = y2, color = v_xy), 
                  arrow = arrow(type = "closed", length = unit(0.2,"cm")),
                  linewidth = 1.2) + 
-    scale_color_viridis_c(option = "F", direction = 1, begin = 0, end = 0.7, name = "Fire\nSpeed\n(km h\u207B\u00B9)", limits = c(0, 3.4), guide = guide_colorbar(barwidth = 0.5, barheight = 5)) +
+    scale_color_viridis_c(option = "F", direction = 1, begin = 0, end = 0.60, name = "Fire\nSpeed\n(km h\u207B\u00B9)", limits = c(0, 3.4), guide = guide_colorbar(barwidth = 0.5, barheight = 5)) +
     scale_fill_gradient(name = "Days\nSince\nIgnition", low = 'grey90', high = 'grey10', limits = c(0, 20), guide = guide_colorbar(barwidth = 0.5, barheight = 5)) +
     #labs(title = paste0(letter_labels[i], " ", yr, " ", perim_name)) +
     labs(title = title_txt) +

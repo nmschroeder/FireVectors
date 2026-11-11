@@ -106,4 +106,22 @@ mtbs_summary <- mtbs_data %>% st_drop_geometry() %>% group_by(nlcd_class) %>% su
                                                                                         median = median(max_v_xy, na.rm = TRUE),
                                                                                         q75 = quantile(max_v_xy, 0.75, na.rm = TRUE),                                                                                  q95 = quantile(max_v_xy, 0.95, na.rm = TRUE))
 
-mtbs_summary
+mtbs_summary %>% 
+  mutate(
+    nlcd_class = recode(nlcd_class, "Herbaceous" = "Grassland")) %>%
+    dplyr::slice(
+      match(c("Forest", "Shrubland", "Grassland"), nlcd_class)
+    ) %>%
+  flextable() %>%
+  colformat_double(digits = 2) %>%
+    theme_booktabs() %>%
+    set_header_labels(
+      nlcd_class = "",
+      mean = "Mean",
+      median = "Median",
+      q75 = "75th Percentile",
+      q95 = "95th Percentile"
+    ) %>%
+  font(fontname = "Arial", part = "all") %>%
+  fontsize(size = 11, part = "all") %>%
+  save_as_docx(path = "Table_03.docx")

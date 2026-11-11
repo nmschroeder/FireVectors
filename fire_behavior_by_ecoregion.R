@@ -111,7 +111,7 @@ modis_df$ecorenamed[idx] <- "CA Coastal Sage, Chaparral, and Oak Woodlands"
 # ggplot() + geom_point(modis_df, mapping = aes(x = dec_date, y = v_xy)) + facet_wrap(~ecorenamed, ncol = 3) + xlab("Date") + ylab("Maximum speed for each fire (km h\u207B\u00B9)")
 # ggsave("trends_by_ecoregion.png", width = 8, height = 10, units = "in")
 # 
-# write.csv(modis_df, "modis_speed_by_ecoregion.csv")
+write.csv(modis_df, "modis_speed_by_ecoregion.csv")
 # Investigate trends for each ecoregion in a table
 
 # Coefficients, standard error, and probabilities
@@ -195,6 +195,8 @@ dplyr::filter(modis_ecoregion_summary, p <= 0.05) %>% arrange(desc(slope))
 
 # View FGR results that are significant to a 95% confidence level
 dplyr::filter(modis_ecoregion_summary, p_fgr <= 0.05) %>% arrange(desc(slope_fgr))
+
+write.csv(modis_ecoregion_summary, "modis_ecoregion_summary.csv")
 
 # Create a field for the L3 ecoregion that matches the ecoregion data frame
 modis_ecoregion_summary$US_L3NAME <- modis_ecoregion_summary$ecoregion
@@ -349,6 +351,9 @@ fastest_speed <- fastest_speed[1:10,]
 mtbs_fastest <- dplyr::filter(mtbs, New_ID %in% fastest_speed$New_ID)
 mtbs_fastest <- right_join(mtbs_fastest, dplyr::select(fastest_speed, v_xy, New_ID), by = "New_ID")
 
+str(mtbs_fastest)
+st_write(mtbs_fastest, "mtbs_fastest_speed.geojson", delete_dsn = TRUE)
+
 modis_perims_fastest_speed <- modis_perims %>% dplyr::filter(New_ID %in% fastest_speed$New_ID)
 modis_vectors <- modis %>% dplyr::filter(New_ID %in% fastest_speed$New_ID)
 
@@ -361,7 +366,6 @@ v_xy_thresh
 id_thresh <- modis_df$New_ID[modis_df$v_xy >= v_xy_thresh]
 mtbs_thresh <- dplyr::filter(mtbs, New_ID %in% id_thresh)
 
-
 # Which ecoregions have the fastest fire speeds? Fire growth rates?
 speed_summary <- wus_ecoregion_summary %>% group_by(ecoregion) %>%
   summarize(N = N[1], max_speed = max_speed[1], max_fgr = max_fgr[1]) %>% drop_na()
@@ -369,6 +373,9 @@ speed_summary <- wus_ecoregion_summary %>% group_by(ecoregion) %>%
 speed_summary %>% arrange(desc(max_speed))
 
 speed_summary %>% arrange(desc(max_fgr))
+
+str(speed_summary)
+st_write(speed_summary, "speed_summary_by_ecoregion.geojson")
 
 c_max <- max(fastest_speed$v_xy)
 
@@ -452,6 +459,7 @@ p_max_fgr
 
 mtbs_fastest_fgr <- dplyr::filter(mtbs, New_ID %in% fastest_fgr$New_ID)
 mtbs_fastest_fgr <- right_join(mtbs_fastest_fgr, dplyr::select(fastest_fgr, max_dAdt, New_ID), by = "New_ID")
+
 
 
 p_fastest_fgr <- ggplot() + geom_sf(data = wus_eco2, fill = 'white', color = 'gray10') +
