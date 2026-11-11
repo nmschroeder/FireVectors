@@ -3,6 +3,10 @@
 Please obtain the following files from their temporary locations below
 
 * Fire progression data
+  * Files from 2026-11-11
+  * [Updated perim_polygons_viirs.geojson for VIIRS](https://o365coloradoedu-my.sharepoint.com/:u:/g/personal/nihe1301_colorado_edu/IQDz-oDkmBA_T6EZ7vNXWWi_AcHiZgroE5x1vfpoV2u_JTE?e=UQa0ir)
+  * [Updated perim_polygons_modis.geojson for MODIS](https://o365coloradoedu-my.sharepoint.com/:u:/g/personal/nihe1301_colorado_edu/IQC85_adQdpgTJJuCL2e2MmZARyuyAgx44cR0A2nKs09Z3s?e=uRyH0J)
+  * Files from 2026-03-31
   * [perim_polygons_viirs.geojson for VIIRS](https://o365coloradoedu-my.sharepoint.com/:u:/g/personal/nihe1301_colorado_edu/IQDK0-1RTt3SR7ytZoAViiVGAXXZXOtV820F3xUBMXFt3EM?e=crfblY)
   * [perim_polygons_modis.geojson for MODIS](https://o365coloradoedu-my.sharepoint.com/:u:/g/personal/nihe1301_colorado_edu/IQBtTiBAQc_6R6f98cWC8V0jAb3Fm3nSA85ve3IxXa4F268?e=ynPm0n)
     
@@ -27,6 +31,12 @@ Please obtain the following files from their temporary locations below
      * The geometry corresponding to the current fire progression        
      
 * Fire vector data
+  * Files from 2026-11-11
+  * [Updated burn_direction_viirs.csv for VIIRS] (https://o365coloradoedu-my.sharepoint.com/:x:/g/personal/nihe1301_colorado_edu/IQAFO9Mb620iT5UyS2QaUXLoATssCynBpL9LH00YyMLf3M8?e=z5yLbW)
+  * [Updated burn_direction_modis.csv for MODIS] (https://o365coloradoedu-my.sharepoint.com/:x:/g/personal/nihe1301_colorado_edu/IQD8AxzXbWskQpwtFU8b8BpaARurCKzZ_uO1MNWlMr-mkFE?e=cedJtf)
+  * [Updated burn_direction_daily.csv for Terra MODIS daily fire speeds] (https://o365coloradoedu-my.sharepoint.com/:x:/g/personal/nihe1301_colorado_edu/IQBYLouwsN0dRo4F83UbTzP8AU8avqaxPXkrFF35BleSG2Y?e=AOYb4A)
+  * [Updated burn_direction_nirops.csv for NIROPS-based daily fire speeds] Update coming
+  * Files from 2026-03-31
   * [burn_direction_viirs.csv for VIIRS](https://o365coloradoedu-my.sharepoint.com/:x:/g/personal/nihe1301_colorado_edu/IQAknOKte3T7TLfELx1ys4zuAeP1xaP7I6Hm2GlKbhNAAPY?e=ZdYRCD)
   * [burn_direction_modis.csv for MODIS](https://o365coloradoedu-my.sharepoint.com/:x:/g/personal/nihe1301_colorado_edu/IQDUPZ66g6DxTZBxYILYCKT0Afv_kEyppv6nP-qn25Sf_U0?e=efYQEq)
   * [burn_direction_daily.csv for Terra MODIS daily fire speeds](https://o365coloradoedu-my.sharepoint.com/:x:/g/personal/nihe1301_colorado_edu/IQCWxjXl6rW1SoAyWCeT28dcAaK-k6fudJchcld5WkHaBBY?e=dTvpi5)
