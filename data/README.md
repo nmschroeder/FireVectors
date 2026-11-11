@@ -35,7 +35,7 @@ Please obtain the following files from their temporary locations below
   * [Updated burn_direction_viirs.csv for VIIRS](https://o365coloradoedu-my.sharepoint.com/:x:/g/personal/nihe1301_colorado_edu/IQAFO9Mb620iT5UyS2QaUXLoATssCynBpL9LH00YyMLf3M8?e=z5yLbW)
   * [Updated burn_direction_modis.csv for MODIS](https://o365coloradoedu-my.sharepoint.com/:x:/g/personal/nihe1301_colorado_edu/IQD8AxzXbWskQpwtFU8b8BpaARurCKzZ_uO1MNWlMr-mkFE?e=cedJtf)
   * [Updated burn_direction_daily.csv for Terra MODIS daily fire speeds](https://o365coloradoedu-my.sharepoint.com/:x:/g/personal/nihe1301_colorado_edu/IQBYLouwsN0dRo4F83UbTzP8AU8avqaxPXkrFF35BleSG2Y?e=AOYb4A)
-  * Updated burn_direction_nirops.csv for NIROPS-based daily fire speeds - Update coming
+  * Updated burn_direction_nirops.csv for NIROPS-based daily fire speeds - No update needed. Please see the link below for this one.
   * Files from 2026-03-31
   * [burn_direction_viirs.csv for VIIRS](https://o365coloradoedu-my.sharepoint.com/:x:/g/personal/nihe1301_colorado_edu/IQAknOKte3T7TLfELx1ys4zuAeP1xaP7I6Hm2GlKbhNAAPY?e=ZdYRCD)
   * [burn_direction_modis.csv for MODIS](https://o365coloradoedu-my.sharepoint.com/:x:/g/personal/nihe1301_colorado_edu/IQDUPZ66g6DxTZBxYILYCKT0Afv_kEyppv6nP-qn25Sf_U0?e=efYQEq)
